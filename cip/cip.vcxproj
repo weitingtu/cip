@@ -77,6 +77,11 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <HeapReserveSize>100000000</HeapReserveSize>
+      <HeapCommitSize>100000000</HeapCommitSize>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -115,6 +120,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ASAP3.cpp" />
+    <ClCompile Include="BisectionSearch.cpp" />
+    <ClCompile Include="IdealCoverageValue.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="RandomNumberGenerator.cpp" />
+    <ClCompile Include="Skart.cpp" />
+    <ClCompile Include="VAMPIRE.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ASAP3.h" />
+    <ClInclude Include="BisectionSearch.h" />
+    <ClInclude Include="IdealCoverageValue.h" />
+    <ClInclude Include="RandomNumberGenerator.h" />
+    <ClInclude Include="Skart.h" />
+    <ClInclude Include="VAMPIRE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
