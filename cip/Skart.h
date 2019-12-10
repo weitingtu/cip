@@ -25,9 +25,9 @@ public:
 	double get_data_mean() const { return _data_mean;  }
 	const std::vector<double>& get_observation() const { return _observation; }
 
+	bool vonNuemannTest(const std::vector<double>& myData, double alpha) const;
 private:
 	double SkewnessFun(const std::vector<double>& myData, int cutOff = 0) const;
-	bool vonNuemannTest(const std::vector<double>& myData, double alpha) const;
 	double SkewnessAdj(const std::vector<double>& nonspacedbatch, double kPrime, double m, double alpha,
 		double sampleMean, double sampleVar, double standardError, int w, double& G1, double& G2) const;
 

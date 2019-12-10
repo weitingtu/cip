@@ -349,7 +349,7 @@ bool Skart::vonNuemannTest(const std::vector<double>& myData, double alpha) cons
 	{
 		succDiff += pow(myData[j] - myData[j + 1], 2);
 	}
-	double ranTestStat = 1 - (succDiff / (2 * sampleMean));
+	double ranTestStat = 1 - (succDiff / (2 * sampleVar));
 
 	// take alpha=0.2 for the 2-sided test
 	int ifault = 0;
@@ -366,12 +366,12 @@ double Skart::SkewnessAdj(const std::vector<double>& nonspacedbatch, double kPri
 	double sampleMean, double sampleVar, double standardError, int w, double& G1, double& G2) const
 {
 	int j = 0;
-	std::vector<double> spacedBatch((int)(kPrime - 1), 0.0);
+	std::vector<double> spacedBatch((int)kPrime, 0.0);
 
 	// computes spaced batch means to calculate the skewness adjustment
 	int dPrime = (int)(ceil(w / m)); // number of batches in a spacer
 	int kDoublePrime = 0;
-	spacedBatch = std::vector<double>((int)floor(kPrime / (dPrime + 1)) - 1, 0.0);
+	spacedBatch = std::vector<double>((int)floor(kPrime / (dPrime + 1)), 0.0);
 	for (int j = dPrime; j < kPrime; j += (dPrime + 1))
 	{
 		spacedBatch[kDoublePrime] = nonspacedbatch[j];

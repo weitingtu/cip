@@ -162,12 +162,12 @@ void RandomNumberGenerator::RT(double T, double DF, double DELTA, double *TNC, d
 	//void up_recur(double *, double, double *, double *, double *,
 	//	double *, double *, double, double *, double *, double *,
 	//	double *, double, double *, double *, double, double);
-	double A, ALBETA, B, DEL, EN, ERRMAX, PI, TMP, AMODE,
-		GEVEN, GODD, HALF, ITRMAX, LAMBDA, ONE, P, PP, Q, QQ,
-		TT, TWO, X, XEVEN, XODD, ZERO, RT_R, ALN_HALF, SQRT_TWO,
-		GAMMLN_A, GAMMLN_J1, GAMMLN_B, ALBETA2, XX, BETA, BETA2,
-		AA, BB, EEN, XXEVEN, XXODD, GGEVEN, GGODD, BBETA, BBETA2,
-		ITR_LEFT;
+	double A = 0.0, ALBETA = 0.0, B = 0.0, DEL = 0.0, EN = 0.0, ERRMAX = 0.0, PI = 0.0, TMP = 0.0, AMODE = 0.0,
+		GEVEN = 0.0, GODD = 0.0, HALF = 0.0, ITRMAX = 0.0, LAMBDA = 0.0, ONE = 0.0, P = 0.0, PP = 0.0, Q = 0.0, QQ = 0.0,
+		TT = 0.0, TWO = 0.0, X = 0.0, XEVEN = 0.0, XODD = 0.0, ZERO = 0.0, RT_R = 0.0, ALN_HALF = 0.0, SQRT_TWO = 0.0,
+		GAMMLN_A = 0.0, GAMMLN_J1 = 0.0, GAMMLN_B = 0.0, ALBETA2 = 0.0, XX = 0.0, BETA = 0.0, BETA2 = 0.0,
+		AA = 0.0, BB = 0.0, EEN = 0.0, XXEVEN = 0.0, XXODD = 0.0, GGEVEN = 0.0, GGODD = 0.0, BBETA = 0.0, BBETA2 = 0.0,
+		ITR_LEFT = 0.0;
 	(void)RT_R;
 	double jplus = 0.;
 	int   NEGDEL, J;
