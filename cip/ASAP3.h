@@ -12,6 +12,7 @@ public:
 private:
 	std::vector<double> generate(int n);
 
+	double _x;
 	double _xsd;
 	float _phi;
 	int _iseed;

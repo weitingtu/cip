@@ -23,6 +23,7 @@ public:
 	double get_CIlb() const { return _CIlb; }
 	double get_CIub() const { return _CIub; }
 	double get_data_mean() const { return _data_mean;  }
+	const std::vector<double>& get_data() const { return _data; }
 	const std::vector<double>& get_observation() const { return _observation; }
 
 	bool vonNuemannTest(const std::vector<double>& myData, double alpha) const;

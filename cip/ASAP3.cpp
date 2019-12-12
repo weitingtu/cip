@@ -1,10 +1,12 @@
 #include "ASAP3.h"
 #include "RandomNumberGenerator.h"
 #include <Algorithm>
+#include <numeric>
 
 
 
 ASAP3::ASAP3(double xsd, float phi, int iseed) :
+	_x(10.0),
 	_xsd(xsd), // 2.1
 	_phi(phi), // 0.8
 	_iseed(iseed),
@@ -28,6 +30,7 @@ void ASAP3::procedure(double alpha)
 	alpha = 0.1;
 	double nominal_coverage = 1 - alpha;
 	double alpha_arp = 0.01;
+	double delta_1 = 0.1;
 	double delta = 0.1;
 	double omega = 0.18421;
 	bool MVTestPassed = false;
@@ -35,12 +38,13 @@ void ASAP3::procedure(double alpha)
 	bool RelPrec = true;
 	double r_star = 0.15;
 	double H_star = 0.0;
+	double theta = 0.0;
 
 	while (true)
 	{
 		// step [1]
 		std::vector<double> data = generate(n);
-		std::vector<double> batch_means(k, 0.0);
+		std::vector<double> batch_means(k, 0.0); // Y
 		for (int k_i = 0; k_i < k; ++k_i)
 		{
 			double batch_mean = 0.0;
@@ -59,11 +63,36 @@ void ASAP3::procedure(double alpha)
 		}
 		truncated_grand_mean /= (data.size() - 4 * m);
 
+		std::vector<double> y;
 		if (!MVTestPassed)
 		{
 			// step [2]
-			if (true)
+			for (size_t k_i = 4; k_i < k; k_i+=4)
 			{
+				for (size_t i = k_i; i < (k_i + 4); ++i)
+				{
+					y.push_back(batch_means.at(i));
+				}
+			}
+//void SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT)
+			bool INIT = false;
+			const std::vector<double>& X = y;
+			int N = (int)y.size();
+			int N1 = N;
+			int N2 = N/2;
+			std::vector<double> A;
+			double W = 0.0;
+			double PW = 0.0;
+			int IFAULT = 0;
+			SWILK( INIT, X, N, N1, N2, A, W, PW, IFAULT );
+			delta = delta_1 * exp( -1 * omega * (index - 1) * (index - 1) );
+			if (PW < delta)
+			{
+				index += 1;
+				k = 256;
+				k_prime = k - 4;
+				m = sqrt(2) * m;
+				n = k * m;
 				// go to [1]
 				continue;
 			}
@@ -76,10 +105,33 @@ void ASAP3::procedure(double alpha)
 
 		// step [3]
 		// ...
-
-		if (true)
+		double a = 0.0;
+		double b = 0.0;
+		for (size_t k_i = 4 + 1; k_i < k; ++k_i)
 		{
+			a += batch_means.at(k_i) * batch_means.at(k_i - 1);
+			b += batch_means.at(k_i - 1) * batch_means.at(k_i - 1);
+		}
+		double phi_hat = a / b;
+
+		if (phi_hat > 0.8)
+		{
+			// reject
 			// go to [1]
+			std::vector<double> mid;
+			mid.push_back(sqrt(2));
+			int ifault = 0;
+			double z = RandomNumberGenerator::ppnd(1 - alpha_arp, &ifault);
+			mid.push_back(log(sin(0.927 - z / sqrt(k_prime))) / log(phi_hat));
+			mid.push_back(4);
+			std::sort(mid.begin(), mid.end());
+			theta = mid.at(1);
+
+			index += 1;
+			k = k; // ki = ki-1
+			k_prime = k - 4;
+			m = (int)ceil(theta * m);
+			n = k * m;
 			continue;
 		}
 		else
@@ -88,22 +140,81 @@ void ASAP3::procedure(double alpha)
 		}
 
         // step [4]
+		std::vector<double> epsilons;
+		for (size_t k_i = 4 + 1; k_i < k; ++k_i)
+		{
+			epsilons.push_back(batch_means.at(k_i) - phi_hat * batch_means.at(k_i - 1));
+		}
+
+		double epsilon_mean = std::accumulate(epsilons.begin(), epsilons.end(), 0.0) / epsilons.size();
+		double var = 0.0;
+		for (size_t i = 0; i < epsilons.size(); ++i)
+		{
+			double u = (epsilons.at(i) - epsilon_mean);
+			var += u * u;
+		}
+		var /= epsilons.size();
+		double var_batch_mean = var / (1 - phi_hat * phi_hat);
+		double var_truncated_grand_mean = 0.0;
+		for (size_t q = -k_prime + 1; q < k_prime; ++q)
+		{
+			var_truncated_grand_mean += (1 - abs((double)q) / k_prime) * var_batch_mean * pow(phi_hat, abs((double)q));
+		}
+		var_truncated_grand_mean /= k_prime;
+
+		// degree of freedom
+		// ...
+		double nu_hat = 0.0; // degree of freedom
+
+		double k_a = k_prime * nu_hat * var_truncated_grand_mean;
+		double k_b = (nu_hat - 2) * var_batch_mean;
+		double k2_hat = k_a / k_b;
+		double k4_hat = 6 * k_a * k_a / ((nu_hat - 4) * k_b * k_b);
+		int ifault = 0;
+		double z = RandomNumberGenerator::ppnd(1 - alpha / 2, &ifault);
+		double half_length = (0.5 + 0.5 * k2_hat - 0.125 * k4_hat + (1 / 24) * k4_hat * z * z) * z * sqrt(var_batch_mean / k_prime);
+
+	    double CIlb = truncated_grand_mean - half_length;
+	    double CIub = truncated_grand_mean + half_length; 
 		
 		// step [5]
-
-		if (true)
+		if (RelPrec)
 		{
+			H_star = r_star * abs(truncated_grand_mean);
+		}
+
+		if (half_length < H_star || (r_star == 0.0 && H_star == 0.0))
+		{
+			// deliver Cilb and CIub;
 			break;
 		}
 		else
 		{
-			if (true)
+			double k_prime_prime = std::max( ceil( pow(half_length/ H_star, 2) * k_prime) - k_prime, 1.0);
+			if ( k + k_prime_prime <= 1504)
 			{
 				// go to [1]
+			    index += 1;
+			    k = k + k_prime_prime;
+		    	k_prime = k - 4;
+				m = m;
+	    		n = k * m;
 			}
 			else
 			{
 				// go to [1]
+			    std::vector<double> mid;
+		     	mid.push_back(sqrt(2));
+				mid.push_back(theta);
+		    	mid.push_back(4);
+		    	std::sort(mid.begin(), mid.end());
+		    	theta = mid.at(1);
+
+	    		index += 1;
+		    	k = k; // ki = ki-1
+		    	k_prime = k - 4;
+    			m = (int)ceil(theta * m);
+	    		n = k * m;
 			}
 		}
 	}
@@ -111,9 +222,14 @@ void ASAP3::procedure(double alpha)
 
 std::vector<double> ASAP3::generate( int n )
 {
+	if (_iseed <= 0)
+	{
+		printf("illegal iseed %d\n", _iseed);
+	}
 	while((int)_data.size() < n )
 	{
-		_data.push_back(RandomNumberGenerator::generator(10.5, _xsd, _phi, 10, &_iseed));
+		_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
+		_data.push_back(_x);
 	}
 
 	return _data;
