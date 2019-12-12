@@ -67,9 +67,9 @@ void ASAP3::procedure(double alpha)
 		if (!MVTestPassed)
 		{
 			// step [2]
-			for (size_t k_i = 4; k_i < k; k_i+=4)
+			for (int k_i = 4; k_i < k; k_i+=4)
 			{
-				for (size_t i = k_i; i < (k_i + 4); ++i)
+				for (int i = k_i; i < (k_i + 4); ++i)
 				{
 					y.push_back(batch_means.at(i));
 				}
@@ -91,7 +91,7 @@ void ASAP3::procedure(double alpha)
 				index += 1;
 				k = 256;
 				k_prime = k - 4;
-				m = sqrt(2) * m;
+				m = (int)(sqrt(2) * m);
 				n = k * m;
 				// go to [1]
 				continue;
@@ -107,7 +107,7 @@ void ASAP3::procedure(double alpha)
 		// ...
 		double a = 0.0;
 		double b = 0.0;
-		for (size_t k_i = 4 + 1; k_i < k; ++k_i)
+		for (int k_i = 4 + 1; k_i < k; ++k_i)
 		{
 			a += batch_means.at(k_i) * batch_means.at(k_i - 1);
 			b += batch_means.at(k_i - 1) * batch_means.at(k_i - 1);
@@ -141,7 +141,7 @@ void ASAP3::procedure(double alpha)
 
         // step [4]
 		std::vector<double> epsilons;
-		for (size_t k_i = 4 + 1; k_i < k; ++k_i)
+		for (int k_i = 4 + 1; k_i < k; ++k_i)
 		{
 			epsilons.push_back(batch_means.at(k_i) - phi_hat * batch_means.at(k_i - 1));
 		}
@@ -156,7 +156,7 @@ void ASAP3::procedure(double alpha)
 		var /= epsilons.size();
 		double var_batch_mean = var / (1 - phi_hat * phi_hat);
 		double var_truncated_grand_mean = 0.0;
-		for (size_t q = -k_prime + 1; q < k_prime; ++q)
+		for (int q = -k_prime + 1; q < k_prime; ++q)
 		{
 			var_truncated_grand_mean += (1 - abs((double)q) / k_prime) * var_batch_mean * pow(phi_hat, abs((double)q));
 		}
@@ -190,7 +190,7 @@ void ASAP3::procedure(double alpha)
 		}
 		else
 		{
-			double k_prime_prime = std::max( ceil( pow(half_length/ H_star, 2) * k_prime) - k_prime, 1.0);
+			int k_prime_prime = std::max( (int)ceil( pow(half_length/ H_star, 2) * k_prime) - k_prime, 1);
 			if ( k + k_prime_prime <= 1504)
 			{
 				// go to [1]
@@ -366,7 +366,7 @@ double SIGN(double i, double j)
 	return -abs(i);
 }
 
-void SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT)
+void ASAP3::SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT) const
 {
 	/*
 		ALGORITHM AS R94 APPL.STATIST. (1995) VOL.44, NO.4

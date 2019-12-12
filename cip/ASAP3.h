@@ -11,6 +11,7 @@ public:
 
 private:
 	std::vector<double> generate(int n);
+	void SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT) const;
 
 	double _x;
 	double _xsd;
