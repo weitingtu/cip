@@ -36,6 +36,7 @@ private:
 		int batchsize, int batchcount, int spacerLength = 0);
 
 private:
+	double _x;
 	double _xsd;
 	float _phi;
 	int _iseed;

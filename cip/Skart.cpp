@@ -3,6 +3,7 @@
 #include <algorithm>
 
 Skart::Skart(double xsd, float phi, int iseed) :
+	_x(10.0),
 	_xsd(2.1),
 	_phi(0.8f),
 	_iseed(iseed),
@@ -78,14 +79,14 @@ void Skart::skart_procedure(
 	if (Skewness <= 4)
 	{
 		m = 1;
-		printf("initial sample size = %d\n", m * k);
+		printf("initial sample size = %d %d\n", m * k, __LINE__);
 	}
 	else
 	{
 		m = 16;
 		// collects data: 20,480=1,280*16
 		data = runSimulation(model, data, m, k);
-		printf("initial sample size = %d\n", m * k);
+		printf("initial sample size = %d %d\n", m * k, __LINE__);
 	}
 	printf("\n");
 
@@ -134,7 +135,7 @@ void Skart::skart_procedure(
 				m = (int)ceil(sqrt(2) * m);
 				k = (int)ceil(0.9 * k);
 				data = runSimulation(model, data, m, k);
-				printf("new sample size = %d\n", m * k);
+				printf("new sample size = %d %d\n", m * k, __LINE__);
 				d = 0;
 				b += 1;
 				for (j = 0; j < k; ++j)
@@ -156,6 +157,7 @@ void Skart::skart_procedure(
 	// skips the warm-up period
 	w = d * m;
 	data = runSimulation(model, data, m, kPrime, w);
+	printf("new sample size = %d %d\n", m * kPrime, __LINE__);
 
     kPrime = (int)ceil(kPrime * pow(1 / 0.9, b));
 	m = std::max(m, (int)floor(data.size() / kPrime));
@@ -163,7 +165,7 @@ void Skart::skart_procedure(
 	if (m * kPrime > (int) data.size())
 	{
 		data = runSimulation(model, data, m, kPrime);
-		printf("new sample size = %d\n", m * kPrime);
+		printf("new sample size = %d %d\n", m * kPrime, __LINE__);
 	}
 
 	 // computes the current set of truncated, nonspaced batch means
@@ -223,7 +225,7 @@ void Skart::skart_procedure(
 		kPrime = std::min((int)kPrimeNew, 1024);
 		nonspacedbatch = std::vector<double>(kPrime - 1, 0.0);
 		data = runSimulation(model, data, m, kPrime);
-		printf("new sample size = %d\n", m * kPrime);
+		printf("new sample size = %d %d\n", m * kPrime, __LINE__);
 		for (j = 0; j < kPrime; ++j)
 		{
 			nonspacedbatch.at(j) = 0;
@@ -425,7 +427,8 @@ std::vector<double> Skart::runSimulation( const std::string& model,
 {
 	while( (int) _data.size() < batchsize * batchcount )
 	{
-		_data.push_back(RandomNumberGenerator::generator(10.5, _xsd, _phi, 10, &_iseed));
+		_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
+		_data.push_back(_x);
 	}
 
 	return std::vector<double>(_data.begin(), _data.begin() + batchsize * batchcount);
