@@ -71,6 +71,7 @@ void Skart::skart_procedure(
 	//generates initial sample of size 1,280
 	std::vector<double> initialData(1, 0.0);
 	std::vector<double> data = runSimulation(model, initialData, 1, k);
+	printf("initial sample size = %d * %d = %d %d\n", 1, k, 1 * k, __LINE__);
 
 	//computes the sample skewness of the last 1024 observations in the sample: 1,024=1,280-256
 	Skewness = SkewnessFun(data, 256);
@@ -79,14 +80,14 @@ void Skart::skart_procedure(
 	if (Skewness <= 4)
 	{
 		m = 1;
-		printf("initial sample size = %d %d\n", m * k, __LINE__);
+		printf("initial sample size = %d * %d = %d %d\n", m, k, m * k, __LINE__);
 	}
 	else
 	{
 		m = 16;
 		// collects data: 20,480=1,280*16
 		data = runSimulation(model, data, m, k);
-		printf("initial sample size = %d %d\n", m * k, __LINE__);
+		printf("initial sample size = %d * %d = %d %d\n", m, k, m * k, __LINE__);
 	}
 	printf("\n");
 
@@ -135,7 +136,7 @@ void Skart::skart_procedure(
 				m = (int)ceil(sqrt(2) * m);
 				k = (int)ceil(0.9 * k);
 				data = runSimulation(model, data, m, k);
-				printf("new sample size = %d %d\n", m * k, __LINE__);
+				printf("new sample size = %d * %d = %d %d\n", m, k, m * k, __LINE__);
 				d = 0;
 				b += 1;
 				for (j = 0; j < k; ++j)
@@ -157,7 +158,7 @@ void Skart::skart_procedure(
 	// skips the warm-up period
 	w = d * m;
 	data = runSimulation(model, data, m, kPrime, w);
-	printf("new sample size = %d %d\n", m * kPrime, __LINE__);
+	printf("new sample size = %d * %d = %d %d\n", m, kPrime, m * kPrime, __LINE__);
 
     kPrime = (int)ceil(kPrime * pow(1 / 0.9, b));
 	m = std::max(m, (int)floor(data.size() / kPrime));
@@ -165,7 +166,7 @@ void Skart::skart_procedure(
 	if (m * kPrime > (int) data.size())
 	{
 		data = runSimulation(model, data, m, kPrime);
-		printf("new sample size = %d %d\n", m * kPrime, __LINE__);
+		printf("new sample size = %d * %d = %d %d\n", m, kPrime, m * kPrime, __LINE__);
 	}
 
 	 // computes the current set of truncated, nonspaced batch means
@@ -225,7 +226,7 @@ void Skart::skart_procedure(
 		kPrime = std::min((int)kPrimeNew, 1024);
 		nonspacedbatch = std::vector<double>(kPrime - 1, 0.0);
 		data = runSimulation(model, data, m, kPrime);
-		printf("new sample size = %d %d\n", m * kPrime, __LINE__);
+		printf("new sample size = %d * %d = %d %d\n", m, kPrime, m * kPrime, __LINE__);
 		for (j = 0; j < kPrime; ++j)
 		{
 			nonspacedbatch.at(j) = 0;
