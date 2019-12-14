@@ -28,5 +28,10 @@ int main()
 	//bool r = s.vonNuemannTest(data, alpha);
 	//printf("r = %s\n", r ? "true" : "false");
 
+	//int ifault = 0;
+	//int i = 0;
+	//double t1 = RandomNumberGenerator::tinv(1 - 0.05464 / 2, 60, 0, &ifault, &i);
+	//printf("t1 = %f\n", t1);
+
 	return 0;
 }

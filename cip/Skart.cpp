@@ -3,9 +3,10 @@
 #include <algorithm>
 
 Skart::Skart(double xsd, float phi, int iseed) :
-	_x(10.0),
-	_xsd(2.1),
-	_phi(0.8f),
+	//_x(10.0),
+	_x(100.0),
+	_xsd(xsd),
+	_phi(phi),
 	_iseed(iseed),
 	_data(),
 	_observation(),
@@ -21,7 +22,8 @@ Skart::~Skart()
 
 void Skart::skart_procedure(double alpha )
 {
-	skart_procedure("MM1", true, precType::relative, alpha, 0.15);
+	//skart_procedure("MM1", true, precType::relative, alpha, 0.15);
+	skart_procedure("MM1", false, precType::relative, alpha, 0.15);
 }
 
 void Skart::skart_procedure(
@@ -160,7 +162,7 @@ void Skart::skart_procedure(
 	data = runSimulation(model, data, m, kPrime, w);
 	printf("new sample size = %d * %d = %d %d\n", m, kPrime, m * kPrime, __LINE__);
 
-    kPrime = (int)ceil(kPrime * pow(1 / 0.9, b));
+    kPrime = (int)ceil(kPrime * pow(1.0 / 0.9, b));
 	m = std::max(m, (int)floor(data.size() / kPrime));
 	nonspacedbatch = std::vector<double>(kPrime, 0.0);
 	if (m * kPrime > (int) data.size())
@@ -269,6 +271,7 @@ void Skart::skart_procedure(
 
 	double CIlb = 0.0;
 	double CIub = 0.0; 
+	printf("sample mean %f half length %f\n", sampleMean, halfLength);
 	if (precReq)
 	{
 		CIlb = sampleMean - halfLength;
@@ -397,24 +400,24 @@ double Skart::SkewnessAdj(const std::vector<double>& nonspacedbatch, double kPri
 	double beta = (spacedMom3 / pow(spacedSampleVar, 1.5)) / (6 * sqrt(kDoublePrime));
 	int ifault = 0;
 	int i = 0;
-	double t1 = RandomNumberGenerator::tinv(alpha, kDoublePrime - 1, 0, &ifault, &i);
+	double t1 = RandomNumberGenerator::tinv(1 - alpha / 2, kDoublePrime - 1, 0, &ifault, &i);
 
 	double t2 = -t1;
 	if ((1 + 6 * beta * (t1 - beta)) < 0)
 	{
-		G1 = pow(2 * beta, -1) * ( -(pow(abs(1 + 6 * beta * (t1 - beta)), 1 / 3)) - 1);
+		G1 = pow(2 * beta, -1) * ( -(pow(abs(1 + 6 * beta * (t1 - beta)), 1.0 / 3)) - 1);
 	}
 	else
 	{
-		G1 = pow(2 * beta, -1) * ( pow(1 + 6 * beta * (t1 - beta), 1 / 3) - 1);
+		G1 = pow(2 * beta, -1) * ( pow(1 + 6 * beta * (t1 - beta), 1.0 / 3) - 1);
 	}
 	if ((1 + 6 * beta * (t2 - beta)) < 0)
 	{
-		G2 = pow(2 * beta, -1) * ( -(pow(abs(1 + 6 * beta * (t2 - beta)), 1 / 3)) - 1);
+		G2 = pow(2 * beta, -1) * ( -(pow(abs(1 + 6 * beta * (t2 - beta)), 1.0 / 3)) - 1);
 	}
 	else
 	{
-		G2 = pow(2 * beta, -1) * ( pow(1 + 6 * beta * (t2 - beta), 1 / 3) - 1);
+		G2 = pow(2 * beta, -1) * ( pow(1 + 6 * beta * (t2 - beta), 1.0 / 3) - 1);
 	}
 	return std::max(standardError*abs(G1), standardError * abs(G2));
 }
@@ -428,7 +431,8 @@ std::vector<double> Skart::runSimulation( const std::string& model,
 {
 	while( (int) _data.size() < batchsize * batchcount )
 	{
-		_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
+		//_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::generator(100.0, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 
