@@ -1,37 +1,51 @@
 #include <stdio.h>
 #include "VAMPIRE.h"
 #include "Skart.h"
+#include "ASAP3.h"
 #include "RandomNumberGenerator.h"
 
 int main()
 {
 	//VAMPIRE vampire;
-	//vampire.run();
+	//vampire.run(VAMPIRE::CIP_TYPE::SKART);
+	//vampire.run(VAMPIRE::CIP_TYPE::ASAP3);
 
 	double xsd = 2.1;
 	float phi = 0.8f;
 	int iseed = 1;
 
-    Skart s(xsd, phi, iseed);
+    //Skart s(xsd, phi, iseed);
 	double alpha = 0.2;
-	s.skart_procedure( alpha);
+	//s.skart_procedure( alpha);
 
-	//double x = 10.0;
+	xsd = 20;
+	ASAP3 a(xsd, phi, iseed);
+	a.procedure(alpha);
+
 	//std::vector<double> data;
-	//for (size_t i = 0; i < 10; ++i)
+	//double x = 10.0;
+	//xsd = 20;
+	//phi = 0.8f;
+	//while(data.size() < 10)
 	//{
 	//	x = RandomNumberGenerator::generator(10.5, xsd, phi, x, &iseed);
-	//	printf("%f\n", x);
 	//	data.push_back(x);
 	//}
 
-	//bool r = s.vonNuemannTest(data, alpha);
-	//printf("r = %s\n", r ? "true" : "false");
+	//for (size_t i = 0; i < data.size(); ++i)
+	//{
+	//	printf("data %f\n", data.at(i));
+	//}
 
-	//int ifault = 0;
-	//int i = 0;
-	//double t1 = RandomNumberGenerator::tinv(1 - 0.05464 / 2, 60, 0, &ifault, &i);
-	//printf("t1 = %f\n", t1);
+	//double a1 = 0.0;
+	//double b1 = 0.0;
+	//for (size_t k = 1; k < data.size(); ++k)
+	//{
+	//	a1 += data.at(k) * data.at(k - 1);
+	//	b1 += data.at(k - 1) * data.at(k - 1);
+	//}
+	//double phi_hat = a1 / b1;
+	//printf("phi hat = %f\n", phi_hat);
 
 	return 0;
 }

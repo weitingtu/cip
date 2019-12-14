@@ -297,11 +297,11 @@ void Skart::skart_procedure(
 	_CIub = CIub;
 	// computes the data means
 	_data_mean = 0.0;
-	for (size_t i = 0; i < data.size(); ++i)
+	for (size_t i = 0; i < _data.size(); ++i)
 	{
-		_data_mean += data[i];
+		_data_mean += _data[i];
 	}
-	_data_mean /= data.size();
+	_data_mean /= _data.size();
 	_observation = data;
 }
 

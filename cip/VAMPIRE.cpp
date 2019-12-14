@@ -15,10 +15,9 @@ VAMPIRE::~VAMPIRE()
 {
 }
 
-double VAMPIRE::run()
+double VAMPIRE::run(CIP_TYPE cip_type)
 {
-	//size_t size = 400;
-	size_t size = 1;
+	size_t size = 400;
 	std::vector<int> iseeds(size, 0);
 	for (size_t i = 0; i < size; ++i)
 	{
@@ -34,7 +33,15 @@ double VAMPIRE::run()
 	{
 		int iseed = iseeds[i];
 		BisectionSearch b;
-		double psi = b.run_skart(xsd, phi, iseed);
+		double psi = 0.0;
+		if(CIP_TYPE::SKART == cip_type)
+		{ 
+     		psi = b.run_skart(xsd, phi, iseed);
+		}
+		else
+		{
+		    psi = b.run_asap3(xsd, phi, iseed);
+		}
 
 		IdealCoverageValue icv(b.get_data_mean() ,b.get_eta(), xsd, phi, b.get_observation());
 		double delta = icv.run();

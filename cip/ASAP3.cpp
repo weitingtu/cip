@@ -7,10 +7,15 @@
 
 ASAP3::ASAP3(double xsd, float phi, int iseed) :
 	_x(10.0),
+	_xmean(10.5),
 	_xsd(xsd), // 2.1
 	_phi(phi), // 0.8
 	_iseed(iseed),
-	_data()
+	_data(),
+	_observation(),
+	_CIlb(0.0),
+	_CIub(0.0),
+	_data_mean(0.0)
 {
 }
 
@@ -40,10 +45,13 @@ void ASAP3::procedure(double alpha)
 	double H_star = 0.0;
 	double theta = 0.0;
 
+	std::vector<double> data;
 	while (true)
 	{
 		// step [1]
-		std::vector<double> data = generate(n);
+		printf("step [1] %d\n", __LINE__);
+		data = generate(n);
+		printf("new sample size = %d * %d = %d %d\n", m, k, m * k, __LINE__);
 		std::vector<double> batch_means(k, 0.0); // Y
 		for (int k_i = 0; k_i < k; ++k_i)
 		{
@@ -67,6 +75,7 @@ void ASAP3::procedure(double alpha)
 		if (!MVTestPassed)
 		{
 			// step [2]
+		    printf("step [2] %d\n", __LINE__);
 			for (int k_i = 4; k_i < k; k_i+=4)
 			{
 				for (int i = k_i; i < (k_i + 4); ++i)
@@ -74,7 +83,6 @@ void ASAP3::procedure(double alpha)
 					y.push_back(batch_means.at(i));
 				}
 			}
-//void SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT)
 			bool INIT = false;
 			const std::vector<double>& X = y;
 			int N = (int)y.size();
@@ -94,15 +102,18 @@ void ASAP3::procedure(double alpha)
 				m = (int)(sqrt(2) * m);
 				n = k * m;
 				// go to [1]
+		        printf("go to step [1] %d\n", __LINE__);
 				continue;
 			}
 			else
 			{
 				MVTestPassed = true;
 			    // go to [3]
+		        printf("go to step [3] %d\n", __LINE__);
 			}
 		}
 
+		printf("step [3] %d\n", __LINE__);
 		// step [3]
 		// ...
 		double a = 0.0;
@@ -118,6 +129,7 @@ void ASAP3::procedure(double alpha)
 		{
 			// reject
 			// go to [1]
+		    printf("go to step [1] %d, phi_hat %f\n", __LINE__, phi_hat);
 			std::vector<double> mid;
 			mid.push_back(sqrt(2));
 			int ifault = 0;
@@ -137,9 +149,11 @@ void ASAP3::procedure(double alpha)
 		else
 		{
 			// go to [4]
+		    printf("go to step [4] %d\n", __LINE__);
 		}
 
         // step [4]
+		printf("step [4] %d\n", __LINE__);
 		std::vector<double> epsilons;
 		for (int k_i = 4 + 1; k_i < k; ++k_i)
 		{
@@ -164,7 +178,7 @@ void ASAP3::procedure(double alpha)
 
 		// degree of freedom
 		// ...
-		double nu_hat = 0.0; // degree of freedom
+		double nu_hat = k_prime - 1; //degree of freedom
 
 		double k_a = k_prime * nu_hat * var_truncated_grand_mean;
 		double k_b = (nu_hat - 2) * var_batch_mean;
@@ -174,10 +188,11 @@ void ASAP3::procedure(double alpha)
 		double z = RandomNumberGenerator::ppnd(1 - alpha / 2, &ifault);
 		double half_length = (0.5 + 0.5 * k2_hat - 0.125 * k4_hat + (1 / 24) * k4_hat * z * z) * z * sqrt(var_batch_mean / k_prime);
 
-	    double CIlb = truncated_grand_mean - half_length;
-	    double CIub = truncated_grand_mean + half_length; 
+	    _CIlb = truncated_grand_mean - half_length;
+	    _CIub = truncated_grand_mean + half_length; 
 		
 		// step [5]
+		printf("step [5] %d\n", __LINE__);
 		if (RelPrec)
 		{
 			H_star = r_star * abs(truncated_grand_mean);
@@ -186,16 +201,18 @@ void ASAP3::procedure(double alpha)
 		if (half_length < H_star || (r_star == 0.0 && H_star == 0.0))
 		{
 			// deliver Cilb and CIub;
+		    printf("deliver Cilb and CIub %d\n", __LINE__);
 			break;
 		}
 		else
 		{
-			int k_prime_prime = std::max( (int)ceil( pow(half_length/ H_star, 2) * k_prime) - k_prime, 1);
-			if ( k + k_prime_prime <= 1504)
+			int k_double_prime = std::max( (int)ceil( pow(half_length/ H_star, 2) * k_prime) - k_prime, 1);
+			if ( k + k_double_prime <= 1504)
 			{
 				// go to [1]
+		        printf("go to step [1] %d\n", __LINE__);
 			    index += 1;
-			    k = k + k_prime_prime;
+			    k = k + k_double_prime;
 		    	k_prime = k - 4;
 				m = m;
 	    		n = k * m;
@@ -203,6 +220,7 @@ void ASAP3::procedure(double alpha)
 			else
 			{
 				// go to [1]
+		        printf("go to step [1] %d\n", __LINE__);
 			    std::vector<double> mid;
 		     	mid.push_back(sqrt(2));
 				mid.push_back(theta);
@@ -218,6 +236,28 @@ void ASAP3::procedure(double alpha)
 			}
 		}
 	}
+
+	printf("\n");
+	printf("xmean = %.2f\n", _xmean);
+	printf("xsd = %.2f\n", _xsd);
+	printf("phi = %.2f\n", _phi);
+	printf("\n");
+	//printf("warm-up period = %d\n", w);
+	//printf("final sample size = %d\n", kPrime * m);
+	//printf("\n");
+	//printf("sample mean = %.2f\n", sampleMean);
+	//printf("sample variance = %.2f\n", sampleVar);
+	printf("\n");
+	printf("cil = %.2f\n", _CIlb);
+	printf("ciu = %.2f\n", _CIub);
+
+	// computes the data means
+	_data_mean = 0.0;
+	_data_mean += std::accumulate(_data.begin(), _data.end(), 0.0);
+	_data_mean /= _data.size();
+	printf("data mean = %.2f\n", _data_mean);
+
+	_observation = data;
 }
 
 std::vector<double> ASAP3::generate( int n )
@@ -228,7 +268,7 @@ std::vector<double> ASAP3::generate( int n )
 	}
 	while((int)_data.size() < n )
 	{
-		_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::generator(_xmean, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 
@@ -374,6 +414,8 @@ void ASAP3::SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N
 		Calculates the Shapiro - Wilk W test and its significance level
 
 	*/
+
+	A.resize(N2);
 
 	double SUMM2 = 0.0, SSUMM2 = 0.0, FAC = 0.0, RSN = 0.0, AN = 0.0, AN25 = 0.0, A1 = 0.0, A2 = 0.0, DELTA = 0.0, RANGE = 0.0;
 	double SA = 0.0, SX = 0.0, SSX = 0.0, SSA = 0.0, SAX = 0.0, ASA = 0.0, XSX = 0.0, SSASSX = 0.0, W1 = 0.0, Y = 0.0, XX = 0.0, XI;
