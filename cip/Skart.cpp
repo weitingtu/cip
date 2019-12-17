@@ -432,7 +432,7 @@ std::vector<double> Skart::runSimulation( const std::string& model,
 	while( (int) _data.size() < batchsize * batchcount )
 	{
 		//_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
-		_x = RandomNumberGenerator::generator(100.0, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::AR1_generator(100.0, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 

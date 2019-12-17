@@ -76,7 +76,7 @@ void ASAP3::procedure(double alpha)
 		{
 			// step [2]
 		    printf("step [2] %d\n", __LINE__);
-			for (int k_i = 4; k_i < k; k_i+=4)
+			for (int k_i = 4; k_i < k; k_i+=8)
 			{
 				for (int i = k_i; i < (k_i + 4); ++i)
 				{
@@ -125,16 +125,20 @@ void ASAP3::procedure(double alpha)
 		}
 		double phi_hat = a / b;
 
-		if (phi_hat > 0.8)
+		double threshold = 0.0;
+		{
+			int ifault = 0;
+			double z = RandomNumberGenerator::ppnd(1 - alpha_arp, &ifault);
+			threshold = sin(0.927 - z / sqrt(k_prime));
+		}
+		if (phi_hat > threshold)
 		{
 			// reject
 			// go to [1]
 		    printf("go to step [1] %d, phi_hat %f\n", __LINE__, phi_hat);
 			std::vector<double> mid;
 			mid.push_back(sqrt(2));
-			int ifault = 0;
-			double z = RandomNumberGenerator::ppnd(1 - alpha_arp, &ifault);
-			mid.push_back(log(sin(0.927 - z / sqrt(k_prime))) / log(phi_hat));
+			mid.push_back(threshold);
 			mid.push_back(4);
 			std::sort(mid.begin(), mid.end());
 			theta = mid.at(1);
@@ -268,7 +272,7 @@ std::vector<double> ASAP3::generate( int n )
 	}
 	while((int)_data.size() < n )
 	{
-		_x = RandomNumberGenerator::generator(_xmean, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::AR1_generator(_xmean, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 
@@ -359,7 +363,7 @@ double ALNORM(double x, bool upper)
 	z = x;
 
 	double alnorm_r = zero;
-	if (0 == z)
+	if (z < 0)
 	{
 		up = !up;
 		z = -z;
@@ -369,7 +373,7 @@ double ALNORM(double x, bool upper)
 		y = half * z * z;
 		if (z > con)
 		{
-			alnorm_r = exp(-y) / (z + c1 + d1 / ( z + c2 + d2 / ( z + c3 + d3 / (z + c4 + d4 / (z + c5 + d5 / ( z + c6))))));
+			alnorm_r = r * exp(-y) / (z + c1 + d1 / ( z + c2 + d2 / ( z + c3 + d3 / (z + c4 + d4 / (z + c5 + d5 / ( z + c6))))));
 		}
 		else
 		{
