@@ -3,8 +3,7 @@
 #include "BisectionSearch.h"
 #include "IdealCoverageValue.h"
 #include <vector>
-
-
+#include <math.h>
 
 VAMPIRE::VAMPIRE()
 {

@@ -1,6 +1,7 @@
 #include "Skart.h"
 #include "RandomNumberGenerator.h"
 #include <algorithm>
+#include <math.h>
 
 Skart::Skart(double xmean, double xsd, float phi, int iseed) :
 	_x(100.0),

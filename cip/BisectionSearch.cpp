@@ -1,8 +1,7 @@
 #include "BisectionSearch.h"
 #include "Skart.h"
 #include "ASAP3.h"
-
-
+#include <math.h>
 
 BisectionSearch::BisectionSearch():
 	_a(0.0),

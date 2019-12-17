@@ -2,6 +2,7 @@
 #include "RandomNumberGenerator.h"
 #include <Algorithm>
 #include <numeric>
+#include <math.h>
 
 
 
