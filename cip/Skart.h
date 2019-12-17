@@ -9,7 +9,7 @@ class Skart
 		relative
 	};
 public:
-	Skart(double xsd, float phi, int iseed);
+	Skart(double xmean, double xsd, float phi, int iseed);
 	~Skart();
 
 	void skart_procedure(double alpha );
@@ -38,6 +38,7 @@ private:
 
 private:
 	double _x;
+	double _xmean;
 	double _xsd;
 	float _phi;
 	int _iseed;

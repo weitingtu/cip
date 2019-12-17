@@ -5,9 +5,9 @@
 
 
 
-ASAP3::ASAP3(double xsd, float phi, int iseed) :
+ASAP3::ASAP3(double xmean, double xsd, float phi, int iseed) :
 	_x(10.0),
-	_xmean(10.5),
+	_xmean(xmean),
 	_xsd(xsd), // 2.1
 	_phi(phi), // 0.8
 	_iseed(iseed),

@@ -4,7 +4,7 @@
 class ASAP3
 {
 public:
-	ASAP3(double xsd, float phi, int iseed);
+	ASAP3(double xmean, double xsd, float phi, int iseed);
 	~ASAP3();
 
 	void procedure(double alpha);

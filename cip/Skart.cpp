@@ -2,9 +2,9 @@
 #include "RandomNumberGenerator.h"
 #include <algorithm>
 
-Skart::Skart(double xsd, float phi, int iseed) :
-	//_x(10.0),
+Skart::Skart(double xmean, double xsd, float phi, int iseed) :
 	_x(100.0),
+	_xmean(xmean),
 	_xsd(xsd),
 	_phi(phi),
 	_iseed(iseed),
@@ -431,8 +431,7 @@ std::vector<double> Skart::runSimulation( const std::string& model,
 {
 	while( (int) _data.size() < batchsize * batchcount )
 	{
-		//_x = RandomNumberGenerator::generator(10.5, _xsd, _phi, _x, &_iseed);
-		_x = RandomNumberGenerator::AR1_generator(100.0, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::AR1_generator(_xmean, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 

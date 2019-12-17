@@ -24,6 +24,7 @@ double VAMPIRE::run(CIP_TYPE cip_type)
 		iseeds.at(i) = i + 1;
 	}
 
+	double xmean = 100.0;
 	double xsd = 2.1;
 	float phi = 0.8f;
 	
@@ -36,11 +37,11 @@ double VAMPIRE::run(CIP_TYPE cip_type)
 		double psi = 0.0;
 		if(CIP_TYPE::SKART == cip_type)
 		{ 
-     		psi = b.run_skart(xsd, phi, iseed);
+     		psi = b.run_skart(xmean, xsd, phi, iseed);
 		}
 		else
 		{
-		    psi = b.run_asap3(xsd, phi, iseed);
+		    psi = b.run_asap3(xmean, xsd, phi, iseed);
 		}
 
 		IdealCoverageValue icv(b.get_data_mean() ,b.get_eta(), xsd, phi, b.get_observation());
