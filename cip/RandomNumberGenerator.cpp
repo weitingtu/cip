@@ -1148,7 +1148,7 @@ double RandomNumberGenerator::ar1(int i, int *iseed, double xmean, double xsd, d
 }
 
 //generate one observation from a AR(1) time series with normal marginal distribution
-double RandomNumberGenerator::AR1_generator(double xmean, double xsd, float phi, double x, int *iseed)
+double RandomNumberGenerator::generator(double xmean, double xsd, float phi, double x, int *iseed)
 {
 	double c, z, p;
 	int ifault;
@@ -1181,42 +1181,5 @@ double RandomNumberGenerator::AR1_generator(double xmean, double xsd, float phi,
 		}
 	}
 	return (x);
-}
-
-double RandomNumberGenerator::MM1_generator(double arate, double srate, double& waitq, int *iseed)
-{
-	double u = u16807d(iseed);
-
-	if (waitq < 0)
-	{
-		double tau = arate / srate;
-		if (u < (1 - tau))
-		{
-			waitq = 0.0;
-		}
-		else
-		{
-			waitq = -log((1 - u) / tau) / (srate - arate);
-		}
-	}
-	else
-	{
-		double ratio = srate / (srate + arate);
-		double x = 0.0;
-		if (u < ratio)
-		{
-			x = log( u / ratio ) / arate;
-		}
-		else
-		{
-			x = - log( (1 - u) / (1 - ratio) ) / srate;
-		}
-		waitq = waitq + x;
-		if (waitq < 0)
-		{
-			waitq = 0.0;
-		}
-	}
-	return 0.0;
 }
 

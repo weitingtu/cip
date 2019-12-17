@@ -30,7 +30,6 @@ public:
 	static void ndtr(double x, double *p, double *d);
 	static double ar1(int i, int *iseed, double xmean, double xsd, double phi, double *x);
 
-	static double AR1_generator(double xmean, double xsd, float phi, double x, int *iseed);
-	static double MM1_generator(double arate, double srate, double& waitq, int *iseed);
+	static double generator(double xmean, double xsd, float phi, double x, int *iseed);
 };
 

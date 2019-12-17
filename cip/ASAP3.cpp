@@ -7,12 +7,15 @@
 
 ASAP3::ASAP3(double xsd, float phi, int iseed) :
 	_x(10.0),
+	_xmean(10.5),
 	_xsd(xsd), // 2.1
 	_phi(phi), // 0.8
 	_iseed(iseed),
 	_data(),
+	_observation(),
 	_CIlb(0.0),
-	_CIub(0.0)
+	_CIub(0.0),
+	_data_mean(0.0)
 {
 }
 
@@ -42,13 +45,14 @@ void ASAP3::procedure(double alpha)
 	double H_star = 0.0;
 	double theta = 0.0;
 
+	std::vector<double> data;
 	while (true)
 	{
 		// step [1]
 		printf("step [1] %d\n", __LINE__);
-		std::vector<double> data = generate(n);
+		data = generate(n);
+		printf("new sample size = %d * %d = %d %d\n", m, k, m * k, __LINE__);
 		std::vector<double> batch_means(k, 0.0); // Y
-		printf("data size %zu k %d * m %d = k * m %d\n", data.size(), k, m, k * m);
 		for (int k_i = 0; k_i < k; ++k_i)
 		{
 			double batch_mean = 0.0;
@@ -72,7 +76,7 @@ void ASAP3::procedure(double alpha)
 		{
 			// step [2]
 		    printf("step [2] %d\n", __LINE__);
-			for (int k_i = 4; k_i < k; k_i+=8)
+			for (int k_i = 4; k_i < k; k_i+=4)
 			{
 				for (int i = k_i; i < (k_i + 4); ++i)
 				{
@@ -121,20 +125,16 @@ void ASAP3::procedure(double alpha)
 		}
 		double phi_hat = a / b;
 
-		double threshold = 0.0;
-		{
-			int ifault = 0;
-			double z = RandomNumberGenerator::ppnd(1 - alpha_arp, &ifault);
-		    threshold = sin(0.927 - z / sqrt(k_prime));
-		}
-		if (phi_hat > threshold)
+		if (phi_hat > 0.8)
 		{
 			// reject
 			// go to [1]
 		    printf("go to step [1] %d, phi_hat %f\n", __LINE__, phi_hat);
 			std::vector<double> mid;
 			mid.push_back(sqrt(2));
-			mid.push_back(threshold);
+			int ifault = 0;
+			double z = RandomNumberGenerator::ppnd(1 - alpha_arp, &ifault);
+			mid.push_back(log(sin(0.927 - z / sqrt(k_prime))) / log(phi_hat));
 			mid.push_back(4);
 			std::sort(mid.begin(), mid.end());
 			theta = mid.at(1);
@@ -237,6 +237,12 @@ void ASAP3::procedure(double alpha)
 		}
 	}
 
+	printf("\n");
+	printf("xmean = %.2f\n", _xmean);
+	printf("xsd = %.2f\n", _xsd);
+	printf("phi = %.2f\n", _phi);
+	printf("\n");
+	//printf("warm-up period = %d\n", w);
 	//printf("final sample size = %d\n", kPrime * m);
 	//printf("\n");
 	//printf("sample mean = %.2f\n", sampleMean);
@@ -245,6 +251,13 @@ void ASAP3::procedure(double alpha)
 	printf("cil = %.2f\n", _CIlb);
 	printf("ciu = %.2f\n", _CIub);
 
+	// computes the data means
+	_data_mean = 0.0;
+	_data_mean += std::accumulate(_data.begin(), _data.end(), 0.0);
+	_data_mean /= _data.size();
+	printf("data mean = %.2f\n", _data_mean);
+
+	_observation = data;
 }
 
 std::vector<double> ASAP3::generate( int n )
@@ -255,7 +268,7 @@ std::vector<double> ASAP3::generate( int n )
 	}
 	while((int)_data.size() < n )
 	{
-		_x = RandomNumberGenerator::AR1_generator(10.5, _xsd, _phi, _x, &_iseed);
+		_x = RandomNumberGenerator::generator(_xmean, _xsd, _phi, _x, &_iseed);
 		_data.push_back(_x);
 	}
 
@@ -346,7 +359,7 @@ double ALNORM(double x, bool upper)
 	z = x;
 
 	double alnorm_r = zero;
-	if (z < 0)
+	if (0 == z)
 	{
 		up = !up;
 		z = -z;
@@ -356,7 +369,7 @@ double ALNORM(double x, bool upper)
 		y = half * z * z;
 		if (z > con)
 		{
-			alnorm_r = r * exp(-y) / (z + c1 + d1 / ( z + c2 + d2 / ( z + c3 + d3 / (z + c4 + d4 / (z + c5 + d5 / ( z + c6))))));
+			alnorm_r = exp(-y) / (z + c1 + d1 / ( z + c2 + d2 / ( z + c3 + d3 / (z + c4 + d4 / (z + c5 + d5 / ( z + c6))))));
 		}
 		else
 		{
