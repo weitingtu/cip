@@ -12,46 +12,75 @@ int main()
 	bool run_skart = true;
 	bool run_asap3 = false;
 
-	double xmean = 100.0;
-	double xsd = 2.1;
-	float phi = 0.8f;
-	int iseed = 1;
+	RandomNumberGenerator::Parameter parameter;
+	parameter.type = RandomNumberGenerator::Type::AR1;
+	parameter.ar1.xmean = 100.0;
+	parameter.ar1.xsd = 2.1;
+	parameter.ar1.phi = 0.8f;
+	parameter.ar1.x   = 100;
+	parameter.ar1.iseed = 1;
+	parameter.mm1.arate = 0.0;
+	parameter.mm1.srate = 0.0;
+	parameter.mm1.waitq = -1.0;
+	parameter.mm1.iseed = 1;
+
 	double alpha = 0.2;
+
+	bool precReq = false;
+	double hrstar = 0.15;
+	bool RelPrec = false;
+	double r_star = 0.15;
+
+	double tolerance = 0.00015;
 
 	if (run_vampire)
 	{
 		VAMPIRE vampire;
 		if (run_skart)
 		{
-			vampire.run(VAMPIRE::CIP_TYPE::SKART);
+			vampire.run(VAMPIRE::CIP_TYPE::SKART, 
+				parameter,
+				alpha,
+				precReq,
+				hrstar,
+				RelPrec,
+				r_star,
+				tolerance);
 		}
 		else if (run_asap3)
 		{
-			vampire.run(VAMPIRE::CIP_TYPE::ASAP3);
+			vampire.run(VAMPIRE::CIP_TYPE::ASAP3,
+				parameter,
+				alpha,
+				precReq,
+				hrstar,
+				RelPrec,
+				r_star,
+				tolerance);
 		}
 	}
 	else if (run_bisection)
 	{
-		BisectionSearch b;
+		BisectionSearch b(tolerance);
 		if (run_skart)
 		{
-		    b.run_skart(xmean, xsd, phi, iseed);
+		    b.run_skart(parameter, precReq, alpha, hrstar );
 		}
 		else if (run_asap3)
 		{
-		    b.run_asap3(xmean, xsd, phi, iseed);
+		    b.run_asap3(parameter, RelPrec, alpha, r_star );
 		}
 	}
 	else if (run_skart)
 	{
-		Skart s(xmean, xsd, phi, iseed);
-		s.skart_procedure(alpha);
+		Skart s(parameter);
+		s.skart_procedure(precReq, alpha, hrstar);
 	}
 	else if (run_asap3)
 	{
-		xsd = 20;
-		ASAP3 a(xmean, xsd, phi, iseed);
-		a.procedure(alpha);
+	    parameter.ar1.xsd = 20.0;
+		ASAP3 a(parameter);
+		a.procedure(RelPrec, alpha, r_star);
 	}
 
 	return 0;

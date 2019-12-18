@@ -1,14 +1,9 @@
 #include "Skart.h"
-#include "RandomNumberGenerator.h"
 #include <algorithm>
 #include <math.h>
 
-Skart::Skart(double xmean, double xsd, float phi, int iseed) :
-	_x(100.0),
-	_xmean(xmean),
-	_xsd(xsd),
-	_phi(phi),
-	_iseed(iseed),
+Skart::Skart(const RandomNumberGenerator::Parameter& p):
+	_parameter(p),
 	_data(),
 	_observation(),
 	_CIlb(0.0),
@@ -21,10 +16,9 @@ Skart::~Skart()
 {
 }
 
-void Skart::skart_procedure(double alpha )
+void Skart::skart_procedure( bool precReq, double alpha, double hrstar )
 {
-	//skart_procedure("MM1", true, precType::relative, alpha, 0.15);
-	skart_procedure("MM1", false, precType::relative, alpha, 0.15);
+	skart_procedure("MM1", precReq, precType::relative, alpha, hrstar);
 }
 
 void Skart::skart_procedure(
@@ -432,8 +426,18 @@ std::vector<double> Skart::runSimulation( const std::string& model,
 {
 	while( (int) _data.size() < batchsize * batchcount )
 	{
-		_x = RandomNumberGenerator::AR1_generator(_xmean, _xsd, _phi, _x, &_iseed);
-		_data.push_back(_x);
+		if (RandomNumberGenerator::Type::AR1 == _parameter.type)
+		{
+		    RandomNumberGenerator::AR1_Parameter& ar1 = _parameter.ar1;
+			ar1.x = RandomNumberGenerator::AR1_generator(ar1.xmean, ar1.xsd, ar1.phi, ar1.x, &ar1.iseed);
+			_data.push_back(ar1.x);
+		}
+		else if (RandomNumberGenerator::Type::MM1 == _parameter.type)
+		{
+		    RandomNumberGenerator::MM1_Parameter& mm1 = _parameter.mm1;
+			RandomNumberGenerator::MM1_generator(mm1.arate, mm1.srate, mm1.waitq, &mm1.iseed);
+			_data.push_back(mm1.waitq);
+		}
 	}
 
 	return std::vector<double>(_data.begin(), _data.begin() + batchsize * batchcount);

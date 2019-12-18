@@ -1,17 +1,12 @@
 #include "ASAP3.h"
-#include "RandomNumberGenerator.h"
 #include <Algorithm>
 #include <numeric>
 #include <math.h>
 
 
 
-ASAP3::ASAP3(double xmean, double xsd, float phi, int iseed) :
-	_x(10.0),
-	_xmean(xmean),
-	_xsd(xsd), // 2.1
-	_phi(phi), // 0.8
-	_iseed(iseed),
+ASAP3::ASAP3(const RandomNumberGenerator::Parameter& p):
+	_parameter(p),
 	_data(),
 	_observation(),
 	_CIlb(0.0),
@@ -25,7 +20,7 @@ ASAP3::~ASAP3()
 {
 }
 
-void ASAP3::procedure(double alpha)
+void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 {
 	// step [0]
 	int index = 1;
@@ -40,9 +35,6 @@ void ASAP3::procedure(double alpha)
 	double delta = 0.1;
 	double omega = 0.18421;
 	bool MVTestPassed = false;
-	// relative precision
-	bool RelPrec = true;
-	double r_star = 0.15;
 	double H_star = 0.0;
 	double theta = 0.0;
 
@@ -243,10 +235,14 @@ void ASAP3::procedure(double alpha)
 	}
 
 	printf("\n");
-	printf("xmean = %.2f\n", _xmean);
-	printf("xsd = %.2f\n", _xsd);
-	printf("phi = %.2f\n", _phi);
-	printf("\n");
+	if (RandomNumberGenerator::Type::AR1 == _parameter.type)
+	{
+		RandomNumberGenerator::AR1_Parameter& ar1 = _parameter.ar1;
+		printf("xmean = %.2f\n", ar1.xmean);
+		printf("xsd = %.2f\n", ar1.xsd);
+		printf("phi = %.2f\n", ar1.phi);
+		printf("\n");
+	}
 	//printf("warm-up period = %d\n", w);
 	//printf("final sample size = %d\n", kPrime * m);
 	//printf("\n");
@@ -267,14 +263,24 @@ void ASAP3::procedure(double alpha)
 
 std::vector<double> ASAP3::generate( int n )
 {
-	if (_iseed <= 0)
-	{
-		printf("illegal iseed %d\n", _iseed);
-	}
 	while((int)_data.size() < n )
 	{
-		_x = RandomNumberGenerator::AR1_generator(_xmean, _xsd, _phi, _x, &_iseed);
-		_data.push_back(_x);
+		if (RandomNumberGenerator::Type::AR1 == _parameter.type)
+		{
+		    RandomNumberGenerator::AR1_Parameter& ar1 = _parameter.ar1;
+			if (ar1.iseed <= 0)
+	        {
+	        	printf("illegal iseed %d\n", ar1.iseed);
+	        }
+			ar1.x = RandomNumberGenerator::AR1_generator(ar1.xmean, ar1.xsd, ar1.phi, ar1.x, &ar1.iseed);
+			_data.push_back(ar1.x);
+		}
+		else if (RandomNumberGenerator::Type::MM1 == _parameter.type)
+		{
+		    RandomNumberGenerator::MM1_Parameter& mm1 = _parameter.mm1;
+			RandomNumberGenerator::MM1_generator(mm1.arate, mm1.srate, mm1.waitq, &mm1.iseed);
+			_data.push_back(mm1.waitq);
+		}
 	}
 
 	return _data;

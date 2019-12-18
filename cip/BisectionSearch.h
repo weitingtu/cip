@@ -1,14 +1,15 @@
 #pragma once
 #include <vector>
+#include "RandomNumberGenerator.h"
 
 class BisectionSearch
 {
 public:
-	BisectionSearch();
+	BisectionSearch(double tolerance);
 	~BisectionSearch();
 
-	double run_skart(double xmean, double xsd, float phi, int iseed);
-	double run_asap3(double xmean, double xsd, float phi, int iseed);
+	double run_skart(const RandomNumberGenerator::Parameter& p, bool precReq, double alpha, double hrstar);
+	double run_asap3(const RandomNumberGenerator::Parameter& p, bool RelPrec, double alpha, double r_star );
 	double get_eta() const { return _eta; }
 	double get_data_mean() const { return _data_mean;  }
 	const std::vector<double>& get_observation() const { return _observation; }

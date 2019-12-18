@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "RandomNumberGenerator.h"
 
 class Skart
 {
@@ -9,10 +10,10 @@ class Skart
 		relative
 	};
 public:
-	Skart(double xmean, double xsd, float phi, int iseed);
+	Skart(const RandomNumberGenerator::Parameter& p);
 	~Skart();
 
-	void skart_procedure(double alpha );
+	void skart_procedure(bool precReq, double alpha, double hrstar );
 	void skart_procedure(
 		const std::string& model,
 		bool precReq,
@@ -37,11 +38,7 @@ private:
 		int batchsize, int batchcount, int spacerLength = 0);
 
 private:
-	double _x;
-	double _xmean;
-	double _xsd;
-	float _phi;
-	int _iseed;
+	RandomNumberGenerator::Parameter _parameter;
 	std::vector<double> _data;
 	std::vector<double> _observation;
 	double _CIlb;

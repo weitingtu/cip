@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
+#include "RandomNumberGenerator.h"
 
 class ASAP3
 {
 public:
-	ASAP3(double xmean, double xsd, float phi, int iseed);
+	ASAP3(const RandomNumberGenerator::Parameter& p);
 	~ASAP3();
 
-	void procedure(double alpha);
+	void procedure(bool RelPrec, double alpha, double r_star);
 
 	double get_CIlb() const { return _CIlb; }
 	double get_CIub() const { return _CIub; }
@@ -18,11 +19,7 @@ private:
 	std::vector<double> generate(int n);
 	void SWILK(bool& INIT, const std::vector<double>& X, int N, int N1, int N2, std::vector<double>& A, double& W, double& PW, int& IFAULT) const;
 
-	double _x;
-	double _xmean;
-	double _xsd;
-	float _phi;
-	int _iseed;
+	RandomNumberGenerator::Parameter _parameter;
 	std::vector<double> _data;
 	std::vector<double> _observation;
 	double _CIlb;

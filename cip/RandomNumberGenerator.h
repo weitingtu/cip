@@ -2,6 +2,29 @@
 class RandomNumberGenerator
 {
 public:
+	enum class Type {
+		AR1,
+		MM1
+	};
+	struct AR1_Parameter {
+		double xmean;
+		double xsd;
+		float phi;
+		double x;
+		int iseed;
+	};
+	struct MM1_Parameter {
+		double arate;
+		double srate;
+		double waitq;
+		int iseed;
+	};
+	struct Parameter
+	{
+		Type type;
+		AR1_Parameter ar1;
+		MM1_Parameter mm1;
+	};
 	RandomNumberGenerator();
 	~RandomNumberGenerator();
 

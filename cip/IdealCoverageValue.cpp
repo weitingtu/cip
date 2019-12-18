@@ -41,6 +41,32 @@ double IdealCoverageValue::run() const
 	return delta;
 }
 
+double IdealCoverageValue::run_mm1() const
+{
+	double observationMean = 0.0;
+	for (size_t i = 0; i < _observation.size(); ++i)
+	{
+		observationMean += _observation[i];
+	}
+	observationMean /= _observation.size();
+	double observationVar = 0.0;
+	for (size_t i = 0; i < _observation.size(); ++i)
+	{
+		observationVar += (_observation[i] - observationMean) * (_observation[i] - observationMean);
+	}
+	observationVar /= _observation.size();
+
+	double sampleMeanSte = sqrt(observationVar);
+
+	double p = (1 + _eta) / 2;
+	int ifault = 0;
+	double idealHalfWidth = RandomNumberGenerator::ppnd( p, &ifault) * sampleMeanSte;
+
+	double delta = 2 * _normalCDF( abs(observationMean - _data_mean) / sampleMeanSte ) - 1;
+
+	return delta;
+}
+
 double IdealCoverageValue::_normalCDF(double value) const
 {
 	return 0.5 * erfc(-value * sqrt(0.5));

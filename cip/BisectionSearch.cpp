@@ -3,14 +3,14 @@
 #include "ASAP3.h"
 #include <math.h>
 
-BisectionSearch::BisectionSearch():
+BisectionSearch::BisectionSearch(double tolerance):
 	_a(0.0),
 	_b(1.0),
 	_eta(0.5),
 	_psi(0.0),
 	_data_mean(0.0),
 	_observation(),
-	_tolerance(0.0015)
+	_tolerance(tolerance)
 {
 }
 
@@ -19,12 +19,13 @@ BisectionSearch::~BisectionSearch()
 {
 }
 
-double BisectionSearch::run_skart(double xmean, double xsd, float phi, int iseed)
+double BisectionSearch::run_skart(const RandomNumberGenerator::Parameter& p, bool precReq, double alpha, double hrstar)
 {
+	_eta = 1 - alpha;
 	while (true)
 	{
-    	Skart s(xmean, xsd, phi, iseed);
-		s.skart_procedure( 1 - _eta );
+    	Skart s(p);
+		s.skart_procedure( precReq, alpha, hrstar );
 
 		double CIlb = s.get_CIlb(); // L
 		double CIub = s.get_CIub(); // U
@@ -59,12 +60,13 @@ double BisectionSearch::run_skart(double xmean, double xsd, float phi, int iseed
 	}
 }
 
-double BisectionSearch::run_asap3(double xmean, double xsd, float phi, int iseed)
+double BisectionSearch::run_asap3( const RandomNumberGenerator::Parameter& p, bool RelPrec, double alpha, double r_star )
 {
+	_eta = 1 - alpha;
 	while (true)
 	{
-    	ASAP3 s(xmean, xsd, phi, iseed);
-		s.procedure( 1 - _eta );
+    	ASAP3 s(p);
+		s.procedure( RelPrec, alpha, r_star );
 
 		double CIlb = s.get_CIlb(); // L
 		double CIub = s.get_CIub(); // U

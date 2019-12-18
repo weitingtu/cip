@@ -8,6 +8,7 @@ public:
 	~IdealCoverageValue();
 
 	double run() const;
+	double run_mm1() const;
 
 private:
 	double _normalCDF(double value) const;
