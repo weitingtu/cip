@@ -13,10 +13,10 @@ public:
 private:
 	double _normalCDF(double value) const;
 
-	double _data_mean;
+	double _xmean;
 	double _eta;
 	double _xsd;
 	float _phi;
-	std::vector<double> _observation;
+	std::vector<double> _data;
 };
 

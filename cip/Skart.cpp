@@ -1,6 +1,7 @@
 #include "Skart.h"
 #include <algorithm>
 #include <math.h>
+#include <numeric>
 
 Skart::Skart(const RandomNumberGenerator::Parameter& p):
 	_parameter(p),
@@ -8,7 +9,8 @@ Skart::Skart(const RandomNumberGenerator::Parameter& p):
 	_observation(),
 	_CIlb(0.0),
 	_CIub(0.0),
-	_data_mean()
+	_data_mean(0.0),
+	_xmean(0.0)
 {
 }
 
@@ -298,6 +300,22 @@ void Skart::skart_procedure(
 	}
 	_data_mean /= _data.size();
 	_observation = data;
+	if (RandomNumberGenerator::Type::AR1 == _parameter.type)
+	{
+		_xmean = _parameter.ar1.xmean;
+	}
+	else if (RandomNumberGenerator::Type::MM1 == _parameter.type)
+	{ 
+		std::vector<double> dd = _data;
+		while (dd.size() < _data.size() * 2)
+		{
+			RandomNumberGenerator::MM1_Parameter& mm1 = _parameter.mm1;
+			RandomNumberGenerator::MM1_generator(mm1.arate, mm1.srate, mm1.waitq, &mm1.iseed);
+			dd.push_back(mm1.waitq);
+		}
+		double dd_mean = std::accumulate(dd.begin(), dd.end(), 0.0) / dd.size(); 
+		_xmean = dd_mean;
+	}
 }
 
 double Skart::SkewnessFun(const std::vector<double>& myData, int cutOff) const

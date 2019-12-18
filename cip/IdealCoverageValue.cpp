@@ -5,12 +5,12 @@
 
 
 
-IdealCoverageValue::IdealCoverageValue(double data_mean, double eta, double xsd, float phi, const std::vector<double>& o):
-	_data_mean(data_mean),
+IdealCoverageValue::IdealCoverageValue(double xmean, double eta, double xsd, float phi, const std::vector<double>& d):
+	_xmean(xmean),
 	_eta(eta),
 	_xsd(xsd),
 	_phi(phi),
-	_observation(o)
+	_data(d)
 {
 }
 
@@ -21,7 +21,7 @@ IdealCoverageValue::~IdealCoverageValue()
 
 double IdealCoverageValue::run() const
 {
-	size_t n = _observation.size();
+	size_t n = _data.size();
 	double a = ((n - 1) / _phi - n + pow(_phi, n - 1)) / pow(1 / _phi - 1, 2);
 	double sampleMeanVar = pow(_xsd, 2 ) / ((1 - pow(_phi, 2 )) * (n * n)) * (n + 2 * a);
 	double sampleMeanSte = sqrt(sampleMeanVar);
@@ -29,40 +29,40 @@ double IdealCoverageValue::run() const
 	double p = (1 + _eta) / 2;
 	int ifault = 0;
 	double idealHalfWidth = RandomNumberGenerator::ppnd( p, &ifault) * sampleMeanSte;
-	double observationMean = 0.0;
-	for (size_t i = 0; i < _observation.size(); ++i)
+	double dataMean = 0.0;
+	for (size_t i = 0; i < _data.size(); ++i)
 	{
-		observationMean += _observation[i];
+		dataMean += _data[i];
 	}
-	observationMean /= _observation.size();
+	dataMean /= _data.size();
 
-	double delta = 2 * _normalCDF( abs(observationMean - _data_mean) / sampleMeanSte ) - 1;
+	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
 
 	return delta;
 }
 
 double IdealCoverageValue::run_mm1() const
 {
-	double observationMean = 0.0;
-	for (size_t i = 0; i < _observation.size(); ++i)
+	double dataMean = 0.0;
+	for (size_t i = 0; i < _data.size(); ++i)
 	{
-		observationMean += _observation[i];
+		dataMean += _data[i];
 	}
-	observationMean /= _observation.size();
-	double observationVar = 0.0;
-	for (size_t i = 0; i < _observation.size(); ++i)
+	dataMean /= _data.size();
+	double dataVar = 0.0;
+	for (size_t i = 0; i < _data.size(); ++i)
 	{
-		observationVar += (_observation[i] - observationMean) * (_observation[i] - observationMean);
+		dataVar += (_data[i] - dataMean) * (_data[i] - dataMean);
 	}
-	observationVar /= _observation.size();
+	dataVar /= _data.size();
 
-	double sampleMeanSte = sqrt(observationVar);
+	double sampleMeanSte = sqrt(dataVar);
 
 	double p = (1 + _eta) / 2;
 	int ifault = 0;
 	double idealHalfWidth = RandomNumberGenerator::ppnd( p, &ifault) * sampleMeanSte;
 
-	double delta = 2 * _normalCDF( abs(observationMean - _data_mean) / sampleMeanSte ) - 1;
+	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
 
 	return delta;
 }

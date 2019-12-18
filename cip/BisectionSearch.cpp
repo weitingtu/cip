@@ -8,6 +8,7 @@ BisectionSearch::BisectionSearch(double tolerance):
 	_b(1.0),
 	_eta(0.5),
 	_psi(0.0),
+	_xmean(0.0),
 	_data_mean(0.0),
 	_data(),
 	_observation(),
@@ -53,6 +54,7 @@ double BisectionSearch::run_skart(const RandomNumberGenerator::Parameter& p, boo
 		if ((_b - _a) <= _tolerance)
 		{
 			_psi = _eta;
+			_xmean = s.get_xmean();
 			_data_mean = s.get_data_mean();
 			_data = s.get_data();
 			_observation = s.get_observation();
@@ -95,6 +97,7 @@ double BisectionSearch::run_asap3( const RandomNumberGenerator::Parameter& p, bo
 		if ((_b - _a) <= _tolerance)
 		{
 			_psi = _eta;
+			_xmean = s.get_xmean();
 			_data_mean = s.get_data_mean();
 			_data = s.get_data();
 			_observation = s.get_observation();

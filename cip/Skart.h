@@ -24,6 +24,7 @@ public:
 	double get_CIlb() const { return _CIlb; }
 	double get_CIub() const { return _CIub; }
 	double get_data_mean() const { return _data_mean;  }
+	double get_xmean() const { return _xmean;  }
 	const std::vector<double>& get_data() const { return _data; }
 	const std::vector<double>& get_observation() const { return _observation; }
 
@@ -44,5 +45,6 @@ private:
 	double _CIlb;
 	double _CIub; 
 	double _data_mean;
+	double _xmean;
 };
 
