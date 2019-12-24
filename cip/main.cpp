@@ -33,54 +33,60 @@ int main()
 
 	double tolerance = 0.00015;
 
-	if (run_vampire)
+	for (int i = 1; i < 400; ++i)
 	{
-		VAMPIRE vampire;
-		if (run_skart)
+	    parameter.ar1.iseed = i;
+	    parameter.mm1.iseed = i;
+
+		if (run_vampire)
 		{
-			vampire.run(VAMPIRE::CIP_TYPE::SKART, 
-				parameter,
-				alpha,
-				precReq,
-				hrstar,
-				RelPrec,
-				r_star,
-				tolerance);
+			VAMPIRE vampire;
+			if (run_skart)
+			{
+				vampire.run(VAMPIRE::CIP_TYPE::SKART,
+					parameter,
+					alpha,
+					precReq,
+					hrstar,
+					RelPrec,
+					r_star,
+					tolerance);
+			}
+			else if (run_asap3)
+			{
+				vampire.run(VAMPIRE::CIP_TYPE::ASAP3,
+					parameter,
+					alpha,
+					precReq,
+					hrstar,
+					RelPrec,
+					r_star,
+					tolerance);
+			}
+		}
+		else if (run_bisection)
+		{
+			BisectionSearch b(tolerance);
+			if (run_skart)
+			{
+				b.run_skart(parameter, precReq, alpha, hrstar);
+			}
+			else if (run_asap3)
+			{
+				b.run_asap3(parameter, RelPrec, alpha, r_star);
+			}
+		}
+		else if (run_skart)
+		{
+			Skart s(parameter);
+			s.skart_procedure(precReq, alpha, hrstar);
 		}
 		else if (run_asap3)
 		{
-			vampire.run(VAMPIRE::CIP_TYPE::ASAP3,
-				parameter,
-				alpha,
-				precReq,
-				hrstar,
-				RelPrec,
-				r_star,
-				tolerance);
+			parameter.ar1.xsd = 20.0;
+			ASAP3 a(parameter);
+			a.procedure(RelPrec, alpha, r_star);
 		}
-	}
-	else if (run_bisection)
-	{
-		BisectionSearch b(tolerance);
-		if (run_skart)
-		{
-		    b.run_skart(parameter, precReq, alpha, hrstar );
-		}
-		else if (run_asap3)
-		{
-		    b.run_asap3(parameter, RelPrec, alpha, r_star );
-		}
-	}
-	else if (run_skart)
-	{
-		Skart s(parameter);
-		s.skart_procedure(precReq, alpha, hrstar);
-	}
-	else if (run_asap3)
-	{
-	    parameter.ar1.xsd = 20.0;
-		ASAP3 a(parameter);
-		a.procedure(RelPrec, alpha, r_star);
 	}
 
 	return 0;
