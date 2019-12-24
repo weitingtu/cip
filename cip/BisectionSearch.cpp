@@ -26,6 +26,7 @@ double BisectionSearch::run_skart(const RandomNumberGenerator::Parameter& p, boo
 	_eta = 1 - alpha;
 	while (true)
 	{
+    	alpha = 1 - _eta;
     	Skart s(p);
 		s.skart_procedure( precReq, alpha, hrstar );
 
@@ -69,6 +70,7 @@ double BisectionSearch::run_asap3( const RandomNumberGenerator::Parameter& p, bo
 	_eta = 1 - alpha;
 	while (true)
 	{
+    	alpha = 1 - _eta;
     	ASAP3 s(p);
 		s.procedure( RelPrec, alpha, r_star );
 
