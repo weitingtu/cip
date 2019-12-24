@@ -33,7 +33,7 @@ int main()
 
 	double tolerance = 0.00015;
 
-	for (int i = 1; i < 400; ++i)
+	for (int i = 1; i <= 400; ++i)
 	{
 	    parameter.ar1.iseed = i;
 	    parameter.mm1.iseed = i;
