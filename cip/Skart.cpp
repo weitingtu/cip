@@ -223,7 +223,7 @@ void Skart::skart_procedure(
 			m = (int)ceil(std::min(maxVal, (double)2) * m);
 		}
 		kPrime = std::min((int)kPrimeNew, 1024);
-		nonspacedbatch = std::vector<double>(kPrime - 1, 0.0);
+		nonspacedbatch = std::vector<double>(kPrime, 0.0);
 		data = runSimulation(model, data, m, kPrime);
 		printf("new sample size = %d * %d = %d %d\n", m, kPrime, m * kPrime, __LINE__);
 		for (j = 0; j < kPrime; ++j)
