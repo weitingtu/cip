@@ -42,22 +42,22 @@ double VAMPIRE::run(CIP_TYPE cip_type,
 		double psi = 0.0;
 		if(CIP_TYPE::SKART == cip_type)
 		{ 
-     		psi = b.run_skart(parameter, precReq, alpha, hrstar );
+     		psi = b.run_skart(p, precReq, alpha, hrstar );
 		}
 		else
 		{
-		    psi = b.run_asap3(parameter, RelPrec, alpha, r_star );
+		    psi = b.run_asap3(p, RelPrec, alpha, r_star );
 		}
 
 		double delta = 0.0;
-		const RandomNumberGenerator::AR1_Parameter& ar1 = parameter.ar1;
-		const RandomNumberGenerator::MM1_Parameter& mm1 = parameter.mm1;
+		const RandomNumberGenerator::AR1_Parameter& ar1 = p.ar1;
+		const RandomNumberGenerator::MM1_Parameter& mm1 = p.mm1;
 		IdealCoverageValue icv(b.get_xmean(), b.get_eta(), ar1.xsd, ar1.phi, mm1.arate, mm1.srate, b.get_data());
-		if (RandomNumberGenerator::Type::AR1 == parameter.type)
+		if (RandomNumberGenerator::Type::AR1 == p.type)
 		{
 		    delta = icv.run();
 		}
-		else if (RandomNumberGenerator::Type::MM1 == parameter.type)
+		else if (RandomNumberGenerator::Type::MM1 == p.type)
 		{ 
 		    delta = icv.run_mm1();
 		}

@@ -37,6 +37,7 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 	bool MVTestPassed = false;
 	double H_star = 0.0;
 	double theta = 0.0;
+	double half_length = 0.0;
 
 	std::vector<double> data;
 	while (true)
@@ -191,7 +192,7 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 		double k4_hat = 6 * k_a * k_a / ((nu_hat - 4) * k_b * k_b);
 		int ifault = 0;
 		double z = RandomNumberGenerator::ppnd(1 - alpha / 2, &ifault);
-		double half_length = (0.5 + 0.5 * k2_hat - 0.125 * k4_hat + (1 / 24) * k4_hat * z * z) * z * sqrt(var_batch_mean / k_prime);
+		half_length = (0.5 + 0.5 * k2_hat - 0.125 * k4_hat + (1 / 24) * k4_hat * z * z) * z * sqrt(var_batch_mean / k_prime);
 
 	    _CIlb = truncated_grand_mean - half_length;
 	    _CIub = truncated_grand_mean + half_length; 
@@ -243,28 +244,29 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 	}
 
 	printf("\n");
-	if (RandomNumberGenerator::Type::AR1 == _parameter.type)
-	{
-		RandomNumberGenerator::AR1_Parameter& ar1 = _parameter.ar1;
-		printf("xmean = %.2f\n", ar1.xmean);
-		printf("xsd = %.2f\n", ar1.xsd);
-		printf("phi = %.2f\n", ar1.phi);
-		printf("\n");
-	}
+	//if (RandomNumberGenerator::Type::AR1 == _parameter.type)
+	//{
+	//	RandomNumberGenerator::AR1_Parameter& ar1 = _parameter.ar1;
+	//	printf("xmean = %.2f\n", ar1.xmean);
+	//	printf("xsd = %.2f\n", ar1.xsd);
+	//	printf("phi = %.2f\n", ar1.phi);
+	//	printf("\n");
+	//}
 	//printf("warm-up period = %d\n", w);
-	//printf("final sample size = %d\n", kPrime * m);
+	printf("final sample size = %d\n", k_prime * m);
 	//printf("\n");
 	//printf("sample mean = %.2f\n", sampleMean);
 	//printf("sample variance = %.2f\n", sampleVar);
 	printf("\n");
 	printf("cil = %.2f\n", _CIlb);
 	printf("ciu = %.2f\n", _CIub);
+	printf("half length = %f\n", half_length);
 
 	// computes the data means
 	_data_mean = 0.0;
 	_data_mean += std::accumulate(_data.begin(), _data.end(), 0.0);
 	_data_mean /= _data.size();
-	printf("data mean = %.2f\n", _data_mean);
+	//printf("data mean = %.2f\n", _data_mean);
 
 	_observation = data;
 	if (RandomNumberGenerator::Type::AR1 == _parameter.type)

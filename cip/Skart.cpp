@@ -281,14 +281,15 @@ void Skart::skart_procedure(
 	}
 
 	printf("\n");
-	printf("warm-up period = %d\n", w);
+	//printf("warm-up period = %d\n", w);
 	printf("final sample size = %d\n", kPrime * m);
-	printf("\n");
-	printf("sample mean = %.2f\n", sampleMean);
-	printf("sample variance = %.2f\n", sampleVar);
-	printf("\n");
+	////printf("\n");
+	//printf("sample mean = %.2f\n", sampleMean);
+	//printf("sample variance = %.2f\n", sampleVar);
+	//printf("\n");
 	printf("cil = %.2f\n", CIlb);
 	printf("ciu = %.2f\n", CIub);
+	printf("half length = %.2f\n", halfLength);
 
 	_CIlb = CIlb;
 	_CIub = CIub;
