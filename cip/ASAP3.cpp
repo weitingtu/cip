@@ -28,7 +28,6 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 	int k = 256;   // batch count
 	int n = m * k; // sample size
 	int k_prime = k - 4;
-	alpha = 0.1;
 	double nominal_coverage = 1 - alpha;
 	double alpha_arp = 0.01;
 	double delta_1 = 0.1;
