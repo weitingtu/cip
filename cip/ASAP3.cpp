@@ -111,10 +111,18 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 		// ...
 		double a = 0.0;
 		double b = 0.0;
-		for (int k_i = 4 + 1; k_i < k; ++k_i)
+		//for (int k_i = 4 + 1; k_i < k; ++k_i)
+		//{
+			//a += batch_means.at(k_i) * batch_means.at(k_i - 1);
+			//b += batch_means.at(k_i - 1) * batch_means.at(k_i - 1);
+		//}
+		for (int k_i = 4; k_i < k - 1; ++k_i)
 		{
-			a += batch_means.at(k_i) * batch_means.at(k_i - 1);
-			b += batch_means.at(k_i - 1) * batch_means.at(k_i - 1);
+			a += (batch_means.at(k_i) - truncated_grand_mean) *  (batch_means.at(k_i + 1) - truncated_grand_mean);
+		}
+		for (int k_i = 4; k_i < k; ++k_i)
+		{
+			b += (batch_means.at(k_i) - truncated_grand_mean) *  (batch_means.at(k_i) - truncated_grand_mean);
 		}
 		double phi_hat = a / b;
 

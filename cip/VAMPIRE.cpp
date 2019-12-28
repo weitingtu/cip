@@ -51,7 +51,8 @@ double VAMPIRE::run(CIP_TYPE cip_type,
 
 		double delta = 0.0;
 		const RandomNumberGenerator::AR1_Parameter& ar1 = parameter.ar1;
-		IdealCoverageValue icv(b.get_xmean(), b.get_eta(), ar1.xsd, ar1.phi, b.get_data());
+		const RandomNumberGenerator::MM1_Parameter& mm1 = parameter.mm1;
+		IdealCoverageValue icv(b.get_xmean(), b.get_eta(), ar1.xsd, ar1.phi, mm1.arate, mm1.srate, b.get_data());
 		if (RandomNumberGenerator::Type::AR1 == parameter.type)
 		{
 		    delta = icv.run();
