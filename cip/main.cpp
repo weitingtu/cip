@@ -7,31 +7,31 @@
 
 int main()
 {
-	bool run_vampire = false;
-	bool run_bisection = true;
+	bool run_vampire = true;
+	bool run_bisection = false;
 	bool run_skart = true;
 	bool run_asap3 = false;
 
 	RandomNumberGenerator::Parameter parameter;
 	parameter.type = RandomNumberGenerator::Type::AR1;
 	parameter.ar1.xmean = 100.0;
-	parameter.ar1.xsd = 2.1;
-	parameter.ar1.phi = 0.8f;
+	parameter.ar1.xsd = 10.0;
+	parameter.ar1.phi = 0.001f;
 	parameter.ar1.x   = 100;
 	parameter.ar1.iseed = 1;
-	parameter.mm1.arate = 0.0;
-	parameter.mm1.srate = 0.0;
+	parameter.mm1.arate = 0.8;
+	parameter.mm1.srate = 1.0;
 	parameter.mm1.waitq = -1.0;
 	parameter.mm1.iseed = 1;
 
-	double alpha = 0.2;
+	double alpha = 0.05;
 
 	bool precReq = false;
-	double hrstar = 0.15;
-	bool RelPrec = false;
-	double r_star = 0.15;
+	double hrstar = 0.0375;
+	bool RelPrec = true;
+	double r_star = 0.0;
 
-	double tolerance = 0.00015;
+	double tolerance = 0.015;
 
     if (run_vampire)
 	{

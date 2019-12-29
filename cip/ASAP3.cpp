@@ -252,7 +252,8 @@ void ASAP3::procedure(bool RelPrec, double alpha, double r_star)
 	//	printf("\n");
 	//}
 	//printf("warm-up period = %d\n", w);
-	printf("final sample size = %d\n", k_prime * m);
+	//printf("final sample size = %d\n", k_prime * m);
+	printf("final sample size = %zu\n", _data.size());
 	//printf("\n");
 	//printf("sample mean = %.2f\n", sampleMean);
 	//printf("sample variance = %.2f\n", sampleVar);
