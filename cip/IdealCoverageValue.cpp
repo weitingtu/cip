@@ -178,12 +178,12 @@ double IdealCoverageValue::run_mm1() const
 	double vxbar = 1.0;
 	// mm1var output
 	int ier     = 0; 
-	double *rho = new double[n];
+	double *rho = new double[n+1];
 	double vx    = 0.0;
 	double arate = 0.0;
 	double srate = 0.0;
 	mm1var( n, tau, vxbar, &ier, rho, &vx, &arate, &srate);
-	delete rho;
+	delete [] rho;
 
 	double dataVar = 1.0 / n * varT * (1 + 2 * vx);
 	//double dataVar = 0.0;
