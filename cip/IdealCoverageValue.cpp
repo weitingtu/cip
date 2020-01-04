@@ -2,6 +2,7 @@
 #include "RandomNumberGenerator.h"
 #include <math.h>
 #include <cmath>
+#include <algorithm>
 
 int mm1var(int n, double tau, double vxbar, int *ier, double *rho,
 	double *vx, double *arate, double *srate)
@@ -128,7 +129,8 @@ IdealCoverageValue::IdealCoverageValue(double xmean, double eta, double xsd, flo
 	_phi(phi),
 	_arate(arate),
 	_srate(srate),
-	_data(d)
+	_data(d),
+	_ideal_half_length(0.0)
 {
 }
 
@@ -137,7 +139,7 @@ IdealCoverageValue::~IdealCoverageValue()
 {
 }
 
-double IdealCoverageValue::run() const
+double IdealCoverageValue::run()
 {
 	size_t n = _data.size();
 	double a = ((n - 1) / _phi - n + pow(_phi, n - 1)) / pow(1 / _phi - 1, 2);
@@ -156,10 +158,11 @@ double IdealCoverageValue::run() const
 
 	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
 
+	_ideal_half_length = idealHalfWidth;
 	return delta;
 }
 
-double IdealCoverageValue::run_mm1() const
+double IdealCoverageValue::run_mm1()
 {
 	double dataMean = 0.0;
 	for (size_t i = 0; i < _data.size(); ++i)
@@ -172,7 +175,6 @@ double IdealCoverageValue::run_mm1() const
 	double alpha = _arate;
 	double nu    = _srate;
 	double varT = pow(tau, 3) * (2 - tau) / (pow(alpha, 2) * pow(1 - tau, 2)) + 1 / (nu * nu);
-	//int mm1var(int n, float tau, float vxbar, int *ier, float *rho, float *vx, float *arate, float *srate);
 	// mm1var input
 	int n = _data.size();
 	double vxbar = 1.0;
@@ -186,12 +188,6 @@ double IdealCoverageValue::run_mm1() const
 	delete [] rho;
 
 	double dataVar = 1.0 / n * varT * (1 + 2 * vx);
-	//double dataVar = 0.0;
-	//for (size_t i = 0; i < _data.size(); ++i)
-	//{
-	//	dataVar += (_data[i] - dataMean) * (_data[i] - dataMean);
-	//}
-	//dataVar /= _data.size();
 
 	double sampleMeanSte = sqrt(dataVar);
 
@@ -201,6 +197,7 @@ double IdealCoverageValue::run_mm1() const
 
 	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
 
+	_ideal_half_length = idealHalfWidth;
 	return delta;
 }
 
@@ -208,3 +205,66 @@ double IdealCoverageValue::_normalCDF(double value) const
 {
 	return 0.5 * erfc(-value * sqrt(0.5));
 }
+
+double IdealCoverageValue::run(size_t n)
+{
+	n = std::min(_data.size(), n);
+	double a = ((n - 1) / _phi - n + pow(_phi, n - 1)) / pow(1 / _phi - 1, 2);
+	double sampleMeanVar = pow(_xsd, 2 ) / ((1 - pow(_phi, 2 )) * (n * n)) * (n + 2 * a);
+	double sampleMeanSte = sqrt(sampleMeanVar);
+
+	double p = (1 + _eta) / 2;
+	int ifault = 0;
+	double idealHalfWidth = RandomNumberGenerator::ppnd( p, &ifault) * sampleMeanSte;
+	double dataMean = 0.0;
+	for (size_t i = 0; i < n; ++i)
+	{
+		dataMean += _data[i];
+	}
+	dataMean /= n;
+
+	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
+
+	_ideal_half_length = idealHalfWidth;
+	return delta;
+}
+
+double IdealCoverageValue::run_mm1(size_t n) 
+{
+	n = std::min(_data.size(), n);
+	double dataMean = 0.0;
+	for (size_t i = 0; i < n; ++i)
+	{
+		dataMean += _data[i];
+	}
+	dataMean /= n;
+
+	double tau   = _arate / _srate;
+	double alpha = _arate;
+	double nu    = _srate;
+	double varT = pow(tau, 3) * (2 - tau) / (pow(alpha, 2) * pow(1 - tau, 2)) + 1 / (nu * nu);
+	// mm1var input
+	double vxbar = 1.0;
+	// mm1var output
+	int ier     = 0; 
+	double *rho = new double[n+1];
+	double vx    = 0.0;
+	double arate = 0.0;
+	double srate = 0.0;
+	mm1var( n, tau, vxbar, &ier, rho, &vx, &arate, &srate);
+	delete [] rho;
+
+	double dataVar = 1.0 / n * varT * (1 + 2 * vx);
+
+	double sampleMeanSte = sqrt(dataVar);
+
+	double p = (1 + _eta) / 2;
+	int ifault = 0;
+	double idealHalfWidth = RandomNumberGenerator::ppnd( p, &ifault) * sampleMeanSte;
+
+	double delta = 2 * _normalCDF( abs(dataMean - _xmean) / sampleMeanSte ) - 1;
+
+	_ideal_half_length = idealHalfWidth;
+	return delta;
+}
+

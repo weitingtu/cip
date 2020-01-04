@@ -49,17 +49,55 @@ double VAMPIRE::run(CIP_TYPE cip_type,
 		    psi = b.run_asap3(p, RelPrec, alpha, r_star );
 		}
 
+	    double dataMean = 0.0;
+    	for (size_t i = 0; i < b.get_data().size(); ++i)
+    	{
+	    	dataMean += b.get_data()[i];
+	    }
+	    dataMean /= b.get_data().size();
+
 		double delta = 0.0;
 		const RandomNumberGenerator::AR1_Parameter& ar1 = p.ar1;
 		const RandomNumberGenerator::MM1_Parameter& mm1 = p.mm1;
-		IdealCoverageValue icv(b.get_xmean(), 1 - alpha, ar1.xsd, ar1.phi, mm1.arate, mm1.srate, b.get_data());
-		if (RandomNumberGenerator::Type::AR1 == p.type)
+		int A = 0;
+		int B = 40000;
+		int n = 20000;
+		int r = 1;
+		while (true)
 		{
-		    delta = icv.run();
-		}
-		else if (RandomNumberGenerator::Type::MM1 == p.type)
-		{ 
-		    delta = icv.run_mm1();
+		    IdealCoverageValue icv(b.get_xmean(), 1 - alpha, ar1.xsd, ar1.phi, mm1.arate, mm1.srate, b.get_data());
+			if (RandomNumberGenerator::Type::AR1 == p.type)
+			{
+				delta = icv.run(n);
+			}
+			else if (RandomNumberGenerator::Type::MM1 == p.type)
+			{
+				delta = icv.run_mm1(n);
+			}
+
+			int C = 0;
+			if (icv.get_ideal_half_length() > r * dataMean)
+			{
+				C = 0;
+			}
+			else
+			{
+				C = 1;
+			}
+
+			if (C == 0)
+			{
+				A = n;
+			}
+			else
+			{
+				B = n;
+			}
+			n = (A + B) / 2;
+			if ((B - A) <= 10)
+			{
+				break;
+			}
 		}
 
 		psi_v.at(i) = psi;
