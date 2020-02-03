@@ -60,36 +60,37 @@ int main()
 					r_star,
 					tolerance);
 			}
-			return 0;
 		}
-
-		for (int i = 1; i <= 400; ++i)
+		else
 		{
-			parameter.ar1.iseed = i;
-			parameter.mm1.iseed = i;
-
-			if (run_bisection)
+			for (int i = 1; i <= 400; ++i)
 			{
-				BisectionSearch b(tolerance);
-				if (run_skart)
+				parameter.ar1.iseed = i;
+				parameter.mm1.iseed = i;
+
+				if (run_bisection)
 				{
-					b.run_skart(parameter, precReq, alpha, hrstar);
+					BisectionSearch b(tolerance);
+					if (run_skart)
+					{
+						b.run_skart(parameter, precReq, alpha, hrstar);
+					}
+					else if (run_asap3)
+					{
+						b.run_asap3(parameter, RelPrec, alpha, r_star);
+					}
+				}
+				else if (run_skart)
+				{
+					Skart s(parameter);
+					s.skart_procedure(precReq, alpha, hrstar);
 				}
 				else if (run_asap3)
 				{
-					b.run_asap3(parameter, RelPrec, alpha, r_star);
+					parameter.ar1.xsd = 20.0;
+					ASAP3 a(parameter);
+					a.procedure(RelPrec, alpha, r_star);
 				}
-			}
-			else if (run_skart)
-			{
-				Skart s(parameter);
-				s.skart_procedure(precReq, alpha, hrstar);
-			}
-			else if (run_asap3)
-			{
-				parameter.ar1.xsd = 20.0;
-				ASAP3 a(parameter);
-				a.procedure(RelPrec, alpha, r_star);
 			}
 		}
 	}
